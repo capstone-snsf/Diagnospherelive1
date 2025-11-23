@@ -20,10 +20,32 @@ const fileToGenerativePart = async (file: File) => {
 };
 
 export const analyzeMedicalImage = async (imageFile: File): Promise<AnalysisResult> => {
-  const API_KEY = process.env.API_KEY;
+  let API_KEY = '';
+
+  // 1. Try VITE_API_KEY (for Vercel/Vite deployments)
+  try {
+    // @ts-ignore
+    if (import.meta && import.meta.env && import.meta.env.VITE_API_KEY) {
+      // @ts-ignore
+      API_KEY = import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {
+    // Ignore errors if import.meta is not available
+  }
+
+  // 2. Fallback to process.env.API_KEY (for local development/Node)
+  if (!API_KEY) {
+    try {
+      if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+        API_KEY = process.env.API_KEY;
+      }
+    } catch (e) {
+      // Ignore errors if process is not available
+    }
+  }
 
   if (!API_KEY) {
-    throw new Error("API Key is missing.");
+    throw new Error("API Key is missing. Please check your .env file or Vercel settings (ensure variable is named VITE_API_KEY).");
   }
   const ai = new GoogleGenAI({ apiKey: API_KEY });
 

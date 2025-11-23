@@ -98,9 +98,27 @@ async function decodeAudioData(
   return buffer;
 }
 
-// Helper to safely get the API Key
+// Helper to safely get the API Key (Supports Vite/Vercel & Local)
 const getApiKey = (): string | undefined => {
-  return process.env.API_KEY;
+  let key = '';
+  // 1. Try VITE_API_KEY (for Vercel/Vite deployments)
+  try {
+    // @ts-ignore
+    if (import.meta && import.meta.env && import.meta.env.VITE_API_KEY) {
+      // @ts-ignore
+      key = import.meta.env.VITE_API_KEY;
+    }
+  } catch (e) {}
+
+  // 2. Fallback to process.env.API_KEY (for local development)
+  if (!key) {
+    try {
+      if (typeof process !== 'undefined' && process.env && process.env.API_KEY) {
+        key = process.env.API_KEY;
+      }
+    } catch (e) {}
+  }
+  return key || undefined;
 };
 
 // --- Hook for Gemini Live API ---
@@ -162,7 +180,7 @@ const useLiveAPI = (
 
         // Initialize Gemini Client
         const apiKey = getApiKey();
-        if (!apiKey) throw new Error("API Key not found");
+        if (!apiKey) throw new Error("API Key not found. Please add VITE_API_KEY to Vercel.");
 
         const ai = new GoogleGenAI({ apiKey });
 
