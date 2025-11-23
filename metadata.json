@@ -1,0 +1,7 @@
+{
+  "name": "DiagnoSpherelive",
+  "description": "An AI-powered tool to analyze medical images like X-rays and MRIs. Users can upload an image to receive a structured summary of possible diagnoses, confidence levels, and suggestions. This application is for demonstration purposes only and is not a clinical tool.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
